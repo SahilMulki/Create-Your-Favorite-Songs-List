@@ -4,8 +4,8 @@ export default function App() {
 
   return (
     <>
-      <div className="text-red-500 font-mono text-[300px]">
-      Hello world
+      <div className="text-red-500 font-mono text-[30px]">
+      Hello world, how are you doing?
       </div>
     </>
   )
