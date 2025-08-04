@@ -1,12 +1,15 @@
 import './App.css'
+import Header from "./components/Header.jsx"
+import ListCustomizer from "./components/ListCustomizer.jsx"
+import MainContent from "./components/MainContent.jsx"
 
 export default function App() {
 
   return (
     <>
-      <div className="text-red-500 font-mono text-[30px]">
-      Hello world, how are you doing?
-      </div>
+      <Header />
+      <ListCustomizer />
+      <MainContent />
     </>
   )
 }
