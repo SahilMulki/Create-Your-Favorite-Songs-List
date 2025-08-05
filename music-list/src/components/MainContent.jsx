@@ -2,22 +2,49 @@ import SongEntry from "./SongEntry.jsx"
 import React from "react"
 import {getAppToken} from "../spotify-api.js"
 
-export default function MainContent(){
+export default function MainContent(props){
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState([]);
   const [token, setToken] = React.useState(null);
   const [isLoggedIntoSpotify, setIsLoggedIntoSpotify] = React.useState(false)
 
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("access_token");
+
+    if (accessToken) {
+      setToken(accessToken);
+      setIsLoggedIntoSpotify(true);
+      
+      // Clean up the URL by removing the access token parameter
+      // This prevents the token from being exposed or bookmarked
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  /*
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("access_token");
+    if (accessToken) {
+      setToken(accessToken);
+    }
+  }, [])
+  */
+
+  /*
   React.useEffect(() => {
     getAppToken().then(tok => { 
       setToken(tok)
     });
   }, []);
+  */
 
   React.useEffect(() => {
     const delay = setTimeout(() => {
       if (query.length > 1 && token) {
-       fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5&market=US`, {
+       fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
         headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => res.json())
@@ -34,6 +61,7 @@ export default function MainContent(){
     }, 300);
     return () => clearTimeout(delay);
   }, [query, token]);
+  
 
 
 
@@ -44,9 +72,12 @@ export default function MainContent(){
     setQuery(event.target.value)
   }
 
+  
   results.forEach(track => {
     console.log(`${track.name} preview:`, track.preview_url);
   });
+
+
 
   return(
     <>
@@ -62,19 +93,21 @@ export default function MainContent(){
           />
         </label>
       </div>
-      <ul>
-        {results.map(track => (
-          <li key={track.id}>
-            <img src={track.album.images[0]?.url} alt="album" width={50} />
-            <div>
-              <strong>{track.name}</strong> by {track.artists[0].name}
-              {isLoggedIntoSpotify && track.preview_url ? (
-                <audio className="bg-purple-400" controls src={track.preview_url} />
-              ): undefined}
-            </div>
-          </li>
-        ))}
-      </ul>
+      {isLoggedIntoSpotify &&
+        <ul>
+            {results.map(track => (
+              <li key={track.id}>
+                <img src={track.album.images[0]?.url} alt="album" width={50} />
+                <div>
+                  <strong>{track.name}</strong> by {track.artists[0].name}
+                  {track.preview_url ? (
+                    <audio className="bg-purple-400" controls src={track.preview_url} />
+                  ) : undefined}
+                </div>
+              </li>
+            ))}
+          </ul>
+      }
       <button className="w-full flex items-center justify-center text-2xl bg-gray-400 mt-2">+</button>
     </>
   )
