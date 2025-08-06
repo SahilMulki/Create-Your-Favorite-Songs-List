@@ -7,19 +7,19 @@ export default function Header(props){
   }
 
   return (
-    <>
-      <div className="flex items-center justify-center w-full h-20 bg-amber-300">
+    <div className="flex bg-amber-300">
+      <div className="flex items-center justify-center w-full h-20">
         <h1 className="text-4xl font-sans font-bold">Create Your Top 100 Songs List</h1>
       </div>
       <div className="flex justify-center items-center h-full">
             <button
               onClick={handleLogin}
-              className="bg-green-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-600 transition duration-300 ease-in-out"
+              className="bg-green-500 text-white font-bold py-3 px-6 w-auto rounded-full shadow-lg hover:bg-green-600 transition duration-300 ease-in-out"
             >
-              Login to Spotify
+              Connect to Spotify
             </button>
       </div>
-    </>
+    </div>
     
   )
 }

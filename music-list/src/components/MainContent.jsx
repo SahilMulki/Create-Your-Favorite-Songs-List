@@ -1,12 +1,14 @@
 import SongEntry from "./SongEntry.jsx"
 import React from "react"
-import {getAppToken} from "../spotify-api.js"
 
 export default function MainContent(props){
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState([]);
   const [token, setToken] = React.useState(null);
   const [isLoggedIntoSpotify, setIsLoggedIntoSpotify] = React.useState(false)
+  const [songList, setSongList] = React.useState([])
+
+  const searchBar = React.useRef(null)
 
 
   React.useEffect(() => {
@@ -22,24 +24,6 @@ export default function MainContent(props){
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
-
-  /*
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("access_token");
-    if (accessToken) {
-      setToken(accessToken);
-    }
-  }, [])
-  */
-
-  /*
-  React.useEffect(() => {
-    getAppToken().then(tok => { 
-      setToken(tok)
-    });
-  }, []);
-  */
 
   React.useEffect(() => {
     const delay = setTimeout(() => {
@@ -73,9 +57,57 @@ export default function MainContent(props){
   }
 
   
-  results.forEach(track => {
-    console.log(`${track.name} preview:`, track.preview_url);
-  });
+  function handleSongSelection(track){
+    console.log(track)
+    /*
+    const songName = track.name
+    const songArtist = track.artists[0].name
+    console.log(`${songName} by ${songArtist}`)
+    */
+    let duplicateSong = false
+    for(let song of songList){
+      if(track.id === song.track.id)
+        duplicateSong = true
+    }
+
+    if(!duplicateSong){
+      setSongList([...songList,
+        {
+          track: track
+        }
+      ])
+    }
+  }
+
+  React.useEffect(() => {
+    if(searchBar !== null){
+      searchBar.current.value=""
+      setQuery("")
+    }
+  }, [songList])
+
+  /*
+    {isLoggedIntoSpotify &&
+        <ul>
+            {results.map(track => (
+              <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-full h-20 justify-center items-center hover:bg-amber-300 p-4" value={track}>
+                <img src={track.album.images[0]?.url} alt="album" width={50} />
+                <div>
+                  <strong>{track.name}</strong> by {track.artists[0].name}
+                  {track.preview_url ? (
+                    <audio className="bg-purple-400" controls src={track.preview_url} />
+                  ) : (
+                    <DeezerPreview trackName={track.name} artistName={track.artists[0].name}/>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+      }
+  */
+  const songComponents = songList.map((song, index) => {
+    return <SongEntry key={song.track.id} track={song.track} index={index}/>
+  })
 
 
 
@@ -90,25 +122,24 @@ export default function MainContent(props){
             onChange={handleChange}
             value={query}
             className="text-2xl border-2 rounded-2xl p-4"
+            ref = {searchBar}
           />
         </label>
       </div>
-      {isLoggedIntoSpotify &&
-        <ul>
+      {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
+        (<ul className="flex items-center justify-center flex-col bg-purple-600 w-full absolute z-10">
             {results.map(track => (
-              <li key={track.id}>
-                <img src={track.album.images[0]?.url} alt="album" width={50} />
-                <div>
+              <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-auto h-20 justify-center items-center hover:bg-amber-300 p-4" value={track}>
+                <div className="text-3xl p-4">
                   <strong>{track.name}</strong> by {track.artists[0].name}
-                  {track.preview_url ? (
-                    <audio className="bg-purple-400" controls src={track.preview_url} />
-                  ) : undefined}
                 </div>
               </li>
             ))}
-          </ul>
+          </ul>) : undefined
       }
-      <button className="w-full flex items-center justify-center text-2xl bg-gray-400 mt-2">+</button>
+      <div className="flex flex-col">
+        {songComponents}
+      </div>
     </>
   )
 }
