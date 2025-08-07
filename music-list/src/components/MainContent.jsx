@@ -1,5 +1,6 @@
 import SongEntry from "./SongEntry.jsx"
 import React from "react"
+import { DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
 
 export default function MainContent(props){
   const [query, setQuery] = React.useState("");
@@ -58,12 +59,7 @@ export default function MainContent(props){
 
   
   function handleSongSelection(track){
-    console.log(track)
-    /*
-    const songName = track.name
-    const songArtist = track.artists[0].name
-    console.log(`${songName} by ${songArtist}`)
-    */
+
     let duplicateSong = false
     for(let song of songList){
       if(track.id === song.track.id)
@@ -86,28 +82,51 @@ export default function MainContent(props){
     }
   }, [songList])
 
+
+
   /*
-    {isLoggedIntoSpotify &&
-        <ul>
-            {results.map(track => (
-              <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-full h-20 justify-center items-center hover:bg-amber-300 p-4" value={track}>
-                <img src={track.album.images[0]?.url} alt="album" width={50} />
-                <div>
-                  <strong>{track.name}</strong> by {track.artists[0].name}
-                  {track.preview_url ? (
-                    <audio className="bg-purple-400" controls src={track.preview_url} />
-                  ) : (
-                    <DeezerPreview trackName={track.name} artistName={track.artists[0].name}/>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-      }
-  */
+  function handleDragEnd(result) {
+    if (!result.destination) return;
+    const items = Array.from(songList);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setSongList(items);
+  }*/
+
+  
   const songComponents = songList.map((song, index) => {
-    return <SongEntry key={song.track.id} track={song.track} index={index}/>
+    return <SongEntry key={song.track.id} track={song.track} index={index + 1} setSongs={setSongList} songs={songList}/>
   })
+  
+  
+  /*
+  <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="song-list" isDropDisabled={false} isCombineEnabled={false} ignoreContainerClipping={false}>
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex flex-col gap-2"
+            >
+              {songList.map((song, index) => (
+                <Draggable key={song.track.id} draggableId={song.track.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className="flex flex-col items-center w-full max-w-4xl mx-auto space-y-4 px-4"
+                    >
+                      <SongEntry track={song.track} index={index + 1} setSongs={setSongList} songsLength={songList.length}/>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext> */
 
 
 
@@ -126,6 +145,7 @@ export default function MainContent(props){
           />
         </label>
       </div>
+
       {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
         (<ul className="flex items-center justify-center flex-col bg-purple-600 w-full absolute z-10">
             {results.map(track => (
@@ -137,9 +157,11 @@ export default function MainContent(props){
             ))}
           </ul>) : undefined
       }
-      <div className="flex flex-col">
+
+      <div className="flex flex-col items-center w-full max-w-4xl mx-auto space-y-4 px-4">
         {songComponents}
-      </div>
+      </div>  
+
     </>
   )
 }
