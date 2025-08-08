@@ -4,6 +4,11 @@ import fetch from "node-fetch";
 import cors from "cors";
 import dotenv from "dotenv";
 
+
+/* This is where the authentication token for spotify is fetched. It also contains a helper function to help support the DeezerPreview component. The client id and client secret comes from the spotify developer dashboard. The redirect uri is set here, the spotify developer dashboard, and in the header.jsx component. The port is specified as the backend runs on localhost:3333. 
+
+*/
+
 dotenv.config({ path: "./project.env" });
 
 const app = express();
@@ -12,7 +17,7 @@ app.use(express.json());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = "https://050b6b8f62a1.ngrok-free.app/callback";
+const REDIRECT_URI = "https://d8165b6e383b.ngrok-free.app/callback";
 const PORT = 3333;
 
 // ✅ Test route

@@ -1,9 +1,13 @@
 export default function Header(props){
 
+  /*
+    The function handleLogin makes it so when the user clicks the button below they will then be redirected to login to spotify. The href is the ngrok tunnel (made from calling ngrok http :3333)
+  */
+
   function handleLogin() {
     // Redirect the user to the backend's login endpoint to begin the Spotify flow
     // Replace with your current ngrok URL
-    window.location.href = "https://050b6b8f62a1.ngrok-free.app/login";
+    window.location.href = "https://d8165b6e383b.ngrok-free.app/login";
   }
 
   return (

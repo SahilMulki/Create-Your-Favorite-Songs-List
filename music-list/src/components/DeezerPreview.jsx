@@ -1,6 +1,11 @@
 import React from "react";
 
 export default function DeezerPreview({ trackName, artistName }) {
+  /*
+    This component is what provides the music preview to the selected songs. There is an API call which provies the song name and artist to the Deezer API. It returns an audio element with the correct (hopefully) preview url.
+  */
+
+
   const [previewUrl, setPreviewUrl] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(false);
