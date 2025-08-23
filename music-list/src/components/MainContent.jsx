@@ -58,10 +58,7 @@ export default function MainContent(props){
   
 
 
-
-
-  //const [songName, setSongName] = React.useState("")
-
+  
   function handleChange(event){
     setQuery(event.target.value)
   }
@@ -78,7 +75,7 @@ export default function MainContent(props){
     if(!duplicateSong){
       setSongList([...songList,
         {
-          track: track
+          track: track,
         }
       ])
     }
@@ -93,51 +90,16 @@ export default function MainContent(props){
   }, [songList])
 
 
-
-  /*
-  function handleDragEnd(result) {
-    if (!result.destination) return;
-    const items = Array.from(songList);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setSongList(items);
-  }*/
-
   
     //Using .map() on the songList to create an array of SongEntry components. The props passed down are: key (required), track (the song objects), index (the index of the element in the list), the setSongs function (I tried to use this for reordering purposes), and the songList itself
   const songComponents = songList.map((song, index) => {
-    return <SongEntry key={song.track.id} track={song.track} index={index + 1} setSongs={setSongList} songs={songList}/>
+    return <SongEntry 
+              key={song.track.id} 
+              track={song.track} 
+              index={index} 
+              list={songList} 
+              setList={setSongList}/>
   })
-  
-  
-  /*
-  <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="song-list" isDropDisabled={false} isCombineEnabled={false} ignoreContainerClipping={false}>
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex flex-col gap-2"
-            >
-              {songList.map((song, index) => (
-                <Draggable key={song.track.id} draggableId={song.track.id} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      className="flex flex-col items-center w-full max-w-4xl mx-auto space-y-4 px-4"
-                    >
-                      <SongEntry track={song.track} index={index + 1} setSongs={setSongList} songsLength={songList.length}/>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext> */
 
 
 
