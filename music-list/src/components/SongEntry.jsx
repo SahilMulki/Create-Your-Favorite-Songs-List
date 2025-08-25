@@ -10,10 +10,15 @@ export default function SongEntry(props){
   const [inputValue, setInputValue] = React.useState(props.index + 1)
   const [oldIndex, setOldIndex] = React.useState(null)
 
+  //test commit
 
   React.useEffect(() => {
     setInputValue(props.index + 1)
   }, [props.index])
+
+  if(true){
+    console.log("this is a test for git hub")
+  }
   
   function storeOldIndex(event){
     setOldIndex(event.target.value - 1)
@@ -74,6 +79,7 @@ export default function SongEntry(props){
               onChange={handleChange}
               onBlur={implementListChanges}
               onFocus={storeOldIndex}
+              //onMouseEnter={() => set}
               className="text-center w-10 h-10 text-bold text-2xl border-2 rounded-2xl mr-10"
             />
             <img src={props.track.album.images[0]?.url} alt="album" width={90} />
