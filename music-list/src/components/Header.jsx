@@ -7,13 +7,13 @@ export default function Header(props){
   function handleLogin() {
     // Redirect the user to the backend's login endpoint to begin the Spotify flow
     // Replace with your current ngrok URL
-    window.location.href = "https://c6eeaf49bea4.ngrok-free.app/login";
+    window.location.href = "https://93dbb00e728d.ngrok-free.app/login";
   }
 
   return (
     <div className="flex bg-amber-300">
       <div className="flex items-center justify-center w-full h-20">
-        <h1 className="text-4xl font-sans font-bold">Create Your Top 100 Songs List</h1>
+        <h1 className="text-4xl font-sans font-bold">Create a List of Your Favorite Songs</h1>
       </div>
       <div className="flex justify-center items-center h-full">
             <button

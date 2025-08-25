@@ -5,12 +5,26 @@ import MainContent from "./components/MainContent.jsx"
 import React from "react"
 
 export default function App() {
+  const [songList, setSongList] = React.useState([])
+  const [maxSongsPerArtist, setMaxSongsPerArtist] = React.useState("");
+  const [maxSongsPerAlbum, setMaxSongsPerAlbum] = React.useState("");
 
   return (
     <>
       <Header />
-      <ListCustomizer />
-      <MainContent />
+      <ListCustomizer 
+        songList={songList} 
+        setSongList={setSongList} 
+        maxSongsPerArtist={maxSongsPerArtist}
+        setMaxSongsPerArtist={setMaxSongsPerArtist} 
+        maxSongsPerAlbum={maxSongsPerAlbum}
+        setMaxSongsPerAlbum={setMaxSongsPerAlbum}
+        />
+      <MainContent 
+        songList={songList} 
+        setSongList={setSongList}
+        maxSongsPerArtist={maxSongsPerArtist} 
+        maxSongsPerAlbum={maxSongsPerAlbum}/>
     </>
   )
 }

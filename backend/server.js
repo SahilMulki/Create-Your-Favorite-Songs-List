@@ -17,7 +17,7 @@ app.use(express.json());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = "https://c6eeaf49bea4.ngrok-free.app/callback";
+const REDIRECT_URI = "https://93dbb00e728d.ngrok-free.app/callback";
 const PORT = 3333;
 
 // ✅ Test route

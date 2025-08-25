@@ -1,5 +1,24 @@
 {
   "dependencies": {
     "react-beautiful-dnd": "^13.1.1"
-  }
+  },
+  "name": "music-list-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "init-tailwind": "tailwindcss init -p"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SahilMulki/Create-Your-Top-100-Songs-List.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SahilMulki/Create-Your-Top-100-Songs-List/issues"
+  },
+  "homepage": "https://github.com/SahilMulki/Create-Your-Top-100-Songs-List#readme",
+  "description": ""
 }
