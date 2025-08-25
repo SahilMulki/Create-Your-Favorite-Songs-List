@@ -115,7 +115,12 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
       return
     }
 
-    setSongList([...songList,{track: track,}])
+    setSongList([...songList,
+      {
+        track: track,
+        notes: ""
+      }
+    ])
   }
 
   //Once the user selects a song, clear the search bar.
@@ -147,6 +152,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
               />
   })
 
+  
 
 
       /*

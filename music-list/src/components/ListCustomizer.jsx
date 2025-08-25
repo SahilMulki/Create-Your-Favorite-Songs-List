@@ -1,7 +1,7 @@
 import React from "react"
 
 export default function ListCustomizer(
-  {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum, setMaxSongsPerArtist, setMaxSongsPerAlbum}){
+  {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum, setMaxSongsPerArtist, setMaxSongsPerAlbum, listTitle, setListTitle}){
   /*
     There's not much here yet, but this is where the logic adding the rules / constraints (ex. one song per album) will go. For now it's just an input where you can name your list, and a placeholder h1 for the Rules.
   */
@@ -31,7 +31,13 @@ export default function ListCustomizer(
         >
             Clear List
         </button>
-        <input className="text-2xl border-2 rounded-2xl p-2" type="text" placeholder="My List"/>
+        <input
+          className="text-2xl border-2 rounded-2xl p-2"
+          type="text"
+          placeholder="My List"
+          value={listTitle}
+          onChange={(e) => setListTitle(e.target.value)}
+        />
         <button className="text-2xl border-2 p-3 rounded-3xl" onClick={showCustomizer}>
           Custom Rules  
         </button>

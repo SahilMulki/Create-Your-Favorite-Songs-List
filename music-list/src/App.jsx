@@ -6,8 +6,9 @@ import React from "react"
 
 export default function App() {
   const [songList, setSongList] = React.useState([])
-  const [maxSongsPerArtist, setMaxSongsPerArtist] = React.useState("");
-  const [maxSongsPerAlbum, setMaxSongsPerAlbum] = React.useState("");
+  const [maxSongsPerArtist, setMaxSongsPerArtist] = React.useState("")
+  const [maxSongsPerAlbum, setMaxSongsPerAlbum] = React.useState("")
+  const [listTitle, setListTitle] = React.useState("")
 
   return (
     <>
@@ -19,12 +20,15 @@ export default function App() {
         setMaxSongsPerArtist={setMaxSongsPerArtist} 
         maxSongsPerAlbum={maxSongsPerAlbum}
         setMaxSongsPerAlbum={setMaxSongsPerAlbum}
+        listTitle={listTitle}
+        setListTitle={setListTitle}
         />
       <MainContent 
         songList={songList} 
         setSongList={setSongList}
         maxSongsPerArtist={maxSongsPerArtist} 
-        maxSongsPerAlbum={maxSongsPerAlbum}/>
+        maxSongsPerAlbum={maxSongsPerAlbum}
+        listTitle={listTitle}/>
     </>
   )
 }

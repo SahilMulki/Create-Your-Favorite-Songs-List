@@ -10,15 +10,9 @@ export default function SongEntry(props){
   const [inputValue, setInputValue] = React.useState(props.index + 1)
   const [oldIndex, setOldIndex] = React.useState(null)
 
-  //test commit
-
   React.useEffect(() => {
     setInputValue(props.index + 1)
   }, [props.index])
-
-  if(true){
-    console.log("this is a test for git hub")
-  }
   
   function storeOldIndex(event){
     setOldIndex(event.target.value - 1)
@@ -51,22 +45,23 @@ export default function SongEntry(props){
   }
 
   function deleteSong(){
-    let index = 0
-    let foundSong = false
-    while(!foundSong){
-      if(props.id === props.list[index].track.id){
-        foundSong = true
-      }
-      else{
-        index++
-      }
-    }
-
     props.setList((oldSongList) => {
       let newSongList = [...oldSongList]
-      newSongList.splice(index, 1)
+      newSongList.splice(props.index, 1)
       return newSongList
     })
+  }
+
+  function handleNotesChange(e){
+    const newNotes = e.target.value
+    props.setList((prevList) => {
+      const updated = [...prevList];
+      updated[props.index] = {
+        ...updated[props.index],
+        notes: newNotes,
+      };
+      return updated;
+    });
   }
 
 
@@ -89,6 +84,13 @@ export default function SongEntry(props){
             <h1 className="text-1xl font-semibold text-center">{props.track.album.name}</h1>
           </div>
           <div className="flex items-center justify-center">
+            <textarea
+            value={props.list[props.index]?.notes || ""}
+            onChange={handleNotesChange}
+            placeholder="Write your notes about this song..."
+            className="w-60 border rounded-md p-2 text-lg mr-5 my-3"
+            rows={3}
+            />
             {props.track.preview_url ? (
               <audio className="bg-purple-400" controls src={props.track.preview_url} />) :
               (<DeezerPreview trackName={props.track.name} artistName={props.track.artists[0].name}/>)
