@@ -6,13 +6,15 @@ import React from "react"
   In this component I handle the process of giving the user to ability to search for songs and add them to the list, by clicking on them. I also render the list of songs that have already been chosen. I also do the actual API call to spotify here, once the authentication token has been retrieved by the backend.
 */
 
-export default function MainContent( {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum} ){
+export default function MainContent( {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum, listTitle} ){
   //Query is what the user types in the search bar. results is the list of songs returned by the search. Token is the authentication token from spotify. isLoggedIntoSpotify is state I used to help with some conditional rendering when user is/isn't logged into Spotify yet. songList is the list of objects of the songs selected by the user. I call .map() on songList to create an array of SongEntry components, which is what ends up being rendered to the page as the list of selected songs.
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState([]);
   const [token, setToken] = React.useState(null);
   const [isLoggedIntoSpotify, setIsLoggedIntoSpotify] = React.useState(false)
   const [warning, setWarning] = React.useState(null)
+  const [alertType, setAlertType] = React.useState("error")
+  const [recommendations, setRecommendations] = React.useState([])
 
   //I'm going to use a ref here so that when search bar is empty or there are no results, there is no dropdown of songs being displayed.
   const searchBar = React.useRef(null)
@@ -99,6 +101,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     let isRuleViolated = checkSongListRules(track)
     if(isRuleViolated){
       setWarning("This song breaks one of your rules.")
+      setAlertType("error");
       setQuery("")
       return
     }
@@ -111,6 +114,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
 
     if(duplicateSong){
       setWarning("That song is already in your list.")
+      setAlertType("error");
       setQuery("")
       return
     }
@@ -152,7 +156,79 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
               />
   })
 
-  
+
+  async function createSpotifyPlaylist() {
+    if (!listTitle || songList.length === 0) {
+      setWarning("Please add a title and at least one song before creating a playlist.");
+      setAlertType("error");
+      return;
+    }
+
+    try {
+      // Step 1: get user profile
+      const profileRes = await fetch("https://api.spotify.com/v1/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const profileData = await profileRes.json();
+      const userId = profileData.id;
+
+      // Step 2: create playlist
+      const createRes = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: listTitle,
+          description: "Created with Create Your Top 100 Songs List 🎶",
+          public: true,
+        }),
+      });
+      const playlistData = await createRes.json();
+
+      // Step 3: add songs
+      const uris = songList.map((song) => song.track.uri);
+      await fetch(`https://api.spotify.com/v1/playlists/${playlistData.id}/tracks`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ uris }),
+      });
+
+      setWarning(`Playlist "${listTitle}" created successfully! 🎉`);
+      setAlertType("success");
+    } catch (error) {
+      console.error("Error creating playlist:", error);
+      setWarning("Something went wrong while creating the playlist.");
+      setAlertType("error");
+    }
+  }
+
+  async function fetchRecommendations() {
+    if (!token || songList.length === 0) return;
+
+    const trackIds = songList.map((s) => s.track.id);
+
+    try {
+      const res = await fetch("http://localhost:3333/recommendations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackIds, accessToken: token }),
+      });
+
+      const recs = await res.json();
+      console.log("Recommendations:", recs);
+
+      // TODO: set state and render them
+      setRecommendations(recs); // maybe store separately
+    } catch (err) {
+      console.error("Error getting recs:", err);
+    }
+  }
+
 
 
       /*
@@ -162,7 +238,11 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     <>
       {warning && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-md">
+          <div className={`px-4 py-3 rounded-lg shadow-md border ${
+                            alertType === "success"
+                              ? "bg-green-100 border-green-400 text-green-700"
+                              : "bg-red-100 border-red-400 text-red-700"
+                          }`}>
             {warning}
           </div>
         </div>
@@ -180,6 +260,12 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
             ref = {searchBar}
           />
         </label>
+        <button
+          onClick={fetchRecommendations}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 mt-4"
+          >
+          Get Song Recommendations
+        </button>
       </div>
 
       {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
@@ -196,8 +282,29 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
 
       <div className="flex flex-col items-center w-full max-w-8xl mx-auto space-y-4 px-4 ">
         {songComponents}
-      </div>  
+      </div> 
 
+      {recommendations.length > 0 && (
+        <div className="w-full mt-6">
+          <h2 className="text-2xl font-bold mb-2">Recommended Songs</h2>
+          <ul>
+            {recommendations.map((track) => (
+              <li key={track.id} className="p-2 border-b">
+                <strong>{track.name}</strong> by {track.artists[0].name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="flex justify-center my-6">
+        <button
+          onClick={createSpotifyPlaylist}
+          className="bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-md hover:bg-blue-600 transition"
+        >
+          Create Playlist on Spotify
+        </button>
+      </div>
     </>
   )
 }

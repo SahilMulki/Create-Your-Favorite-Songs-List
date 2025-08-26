@@ -7,7 +7,7 @@ export default function Header(props){
   function handleLogin() {
     // Redirect the user to the backend's login endpoint to begin the Spotify flow
     // Replace with your current ngrok URL
-    window.location.href = "https://1e976003773e.ngrok-free.app/login";
+    window.location.href = "https://64472ef04fd3.ngrok-free.app/login";
   }
 
   return (
