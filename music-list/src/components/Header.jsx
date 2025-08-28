@@ -4,12 +4,14 @@ export default function Header(props){
     This component displays the title of the page as well as the button that the user can click to connect with spotify.
   */
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3333";
+
   function handleLogin() {
     // Redirect the user to the backend's login endpoint to begin the Spotify flow
     // Replace with your current ngrok URL
-    window.location.href = "https://5f2b97d58a8a.ngrok-free.app/login";
+    window.location.href = `${BACKEND_URL}/login`;
   }
-  
+
    return (
     <div className="relative h-24 flex items-center mt-5 bg-gray-800 border-black rounded-4xl ">
       <div className="w-full flex flex-col items-center">

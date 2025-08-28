@@ -12,18 +12,24 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./project.env" });
 
 const app = express();
-app.use(cors());
+//app.use(cors());
 app.use(express.json());
+
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+// 🔧 Spotify will redirect the user back to your frontend
+const REDIRECT_URI = `${FRONTEND_URL}/callback`;
+
+app.use(
+  cors({
+    origin: [FRONTEND_URL, "http://localhost:5173"],
+    credentials: true,
+  })
+);
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = "https://5f2b97d58a8a.ngrok-free.app/callback";
-const PORT = 3333;
-
-// ✅ Test route
-app.get("/test", (req, res) => {
-  res.send("Server is working");
-});
+//const REDIRECT_URI = "https://5f2b97d58a8a.ngrok-free.app/callback";
+const PORT = process.env.PORT || 3333;
 
 // ✅ Step 1: Redirect to Spotify login
 app.get("/login", (req, res) => {
@@ -140,9 +146,8 @@ async function refreshAccessToken(refreshToken) {
 }
 
 
+app.get("/test", (req, res) => res.send("Server is working"));
 
-
-// ✅ Only listen ONCE, after all routes are defined
 app.listen(PORT, () => {
   console.log(`✅ Backend running on http://localhost:${PORT}`);
 });
