@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 body{
-  background-color: rgb(247, 247, 213);
-  margin-left: 10px;
-  margin-right: 10px;
+  background-color: rgb(30, 30, 30);
+  margin-left: 15px;
+  margin-right: 15px;
   margin-top: 10px;
+  font-family: 'Zain', sans-serif;
+  color: white
 }

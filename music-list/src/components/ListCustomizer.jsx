@@ -1,49 +1,50 @@
 import React from "react"
 
+/*
+  This component allows the user to customize their list by adding a title and adding custom rules. In this component there is also a clear list button. This component takes some props from App.jsx.
+ */
+
 export default function ListCustomizer(
   {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum, setMaxSongsPerArtist, setMaxSongsPerAlbum, listTitle, setListTitle}){
-  /*
-    There's not much here yet, but this is where the logic adding the rules / constraints (ex. one song per album) will go. For now it's just an input where you can name your list, and a placeholder h1 for the Rules.
-  */
+
+  //Setting state for variables that allow the user to see the rules customizer.
   const [customizerIsShown, setCustomizerIsShown] = React.useState(false)
-
   const [maxSongsPerArtistEnabled, setMaxSongsPerArtistEnabled] = React.useState(false);
-  //const [maxSongsPerArtist, setMaxSongsPerArtist] = React.useState("");
-
   const [maxSongsPerAlbumEnabled, setMaxSongsPerAlbumEnabled] = React.useState(false);
-  //const [maxSongsPerAlbum, setMaxSongsPerAlbum] = React.useState("");
 
 
-  function clearSongList(){
+  function clearSongList() {
     setSongList([])
   }
 
-  function showCustomizer(){
+  function showCustomizer() {
     setCustomizerIsShown(!customizerIsShown)
   }
 
   return (
-    <div className="flex flex-col items-center mx-2 h-20 my-4 rounded-2xl">
-      <div className="flex w-full bg-cyan-300 justify-between mx-2">
+    <div className="flex items-center p-3 h-20 my-5 bg-gray-800 border-black rounded-4xl">
+      <div className="flex w-full justify-between mx-2">
         <button 
-          className="text-3xl border-2 p-3 rounded-3xl"
+          className="bg-gray-800 text-3xl border-2 p-3 rounded-3xl hover:bg-gray-600 transition duration-300 ease-in-out cursor-pointer"
           onClick={clearSongList}
         >
             Clear List
         </button>
         <input
-          className="text-2xl border-2 rounded-2xl p-2"
+          className="text-4xl border-2 rounded-2xl p-2 text-center"
           type="text"
           placeholder="My List"
           value={listTitle}
           onChange={(e) => setListTitle(e.target.value)}
         />
-        <button className="text-2xl border-2 p-3 rounded-3xl" onClick={showCustomizer}>
+        <button 
+          className="bg-gray-800 text-2xl border-2 p-3 cursor-pointer rounded-3xl hover:bg-gray-600 transition duration-300 ease-in-out" 
+          onClick={showCustomizer}>
           Custom Rules  
         </button>
       </div>
       {customizerIsShown ?
-      <div className="absolute mt-20 w-full bg-white border rounded-lg shadow-lg p-4 z-20">
+      <div className="absolute mt-50 text-3xl w-full bg-white border rounded-lg shadow-lg p-4 z-20">
           <label className="flex items-center mb-3">
             <input
               type="checkbox"
@@ -51,7 +52,7 @@ export default function ListCustomizer(
               onChange={(e) => 
                 {
                   setMaxSongsPerArtistEnabled(e.target.checked)
-                  if(!e.target.checked)
+                  if (!e.target.checked)
                     setMaxSongsPerArtist("")
                 }}
               className="mr-2"

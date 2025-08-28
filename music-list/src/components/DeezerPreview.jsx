@@ -1,10 +1,10 @@
 import React from "react";
 
-export default function DeezerPreview({ trackName, artistName }) {
-  /*
-    This component is what provides the music preview to the selected songs. There is an API call which provies the song name and artist to the Deezer API. It returns an audio element with the correct (hopefully) preview url.
-  */
+/*
+  This component is what provides the music preview to the selected songs. There is an API call which provies the song name and artist to the Deezer API. It returns an audio element with the correct preview url.
+*/
 
+export default function DeezerPreview({ trackName, artistName }) {
 
   const [previewUrl, setPreviewUrl] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
@@ -34,8 +34,10 @@ export default function DeezerPreview({ trackName, artistName }) {
     fetchPreview();
   }, [trackName, artistName]);
 
-  if (loading) return <p className="text-sm italic">Loading preview...</p>;
-  if (error || !previewUrl) return <p className="text-sm italic">No preview available</p>;
+  if (loading) 
+    return <p className="text-sm italic">Loading preview...</p>;
+  if (error || !previewUrl) 
+    return <p className="text-sm italic">No preview available</p>;
 
   return <audio controls src={previewUrl} />;
 }

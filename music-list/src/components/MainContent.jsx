@@ -1,39 +1,55 @@
 import SongEntry from "./SongEntry.jsx"
 import React from "react"
 
-
 /*
-  In this component I handle the process of giving the user to ability to search for songs and add them to the list, by clicking on them. I also render the list of songs that have already been chosen. I also do the actual API call to spotify here, once the authentication token has been retrieved by the backend.
+  In this component I handle the process of giving the user to ability to search for songs and add them to the list, by clicking on them. I also render the list of songs that have already been chosen. I also do the actual API call to spotify here, once the authentication token has been retrieved by the backend. There is also some logic to automatically refresh the token when it expires.
 */
 
-export default function MainContent( {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum, listTitle} ){
-  //Query is what the user types in the search bar. results is the list of songs returned by the search. Token is the authentication token from spotify. isLoggedIntoSpotify is state I used to help with some conditional rendering when user is/isn't logged into Spotify yet. songList is the list of objects of the songs selected by the user. I call .map() on songList to create an array of SongEntry components, which is what ends up being rendered to the page as the list of selected songs.
+export default function MainContent( {songList, setSongList, maxSongsPerArtist, maxSongsPerAlbum, listTitle} ) {
+  /*
+    Explanation of the state variables below:
+
+    - query is what the user types in the search bar. 
+    - results is the list of songs returned by the search. 
+    - token is the authentication token from spotify.
+    - isLoggedIntoSpotify is state I used to help with some conditional rendering when user is/isn't logged into Spotify yet. 
+    - songList is the list of objects of the songs selected by the user. I call .map() on songList to create an array of SongEntry components, which is what ends up being rendered to the page as the list of selected songs.
+    - The warning and alertType help communicate errors and successes with the user, specifically as it relates to creating a Spotify playlist from their list.
+  */
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState([]);
   const [token, setToken] = React.useState(null);
   const [isLoggedIntoSpotify, setIsLoggedIntoSpotify] = React.useState(false)
   const [warning, setWarning] = React.useState(null)
   const [alertType, setAlertType] = React.useState("error")
-  const [recommendations, setRecommendations] = React.useState([])
 
-  //I'm going to use a ref here so that when search bar is empty or there are no results, there is no dropdown of songs being displayed.
+  //There is a ref here so that when search bar is empty or there are no results, there is no dropdown of songs being displayed.
   const searchBar = React.useRef(null)
 
+  // This useEffect function gets the accessToken, refreshToken, and when the access token expires from the url once the user has been refirected after connecting with spotify. The refresh token is stored in localStorage. Once that information is stored the url is cleared of the information.
+ React.useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const accessToken = params.get("access_token");
+  const refreshToken = params.get("refresh_token");
+  const expiresIn = params.get("expires_in");
+  
 
-  //Get the token from the url. Then set the state of setToken.
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("access_token");
+  if (accessToken) {
+    setToken(accessToken);
+    setIsLoggedIntoSpotify(true);
 
-    if (accessToken) {
-      setToken(accessToken);
-      setIsLoggedIntoSpotify(true);
-      
-      // Clean up the URL by removing the access token parameter
-      // This prevents the token from being exposed or bookmarked
-      window.history.replaceState({}, document.title, window.location.pathname);
+    if (refreshToken) {
+      localStorage.setItem("refresh_token", refreshToken);
     }
+    if (expiresIn) {
+      const expiryTime = Date.now() + expiresIn * 1000;
+      localStorage.setItem("token_expiry", expiryTime);
+    }
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
   }, []);
+
 
   // This is the api call. Note that the authentication token is needed to make this call for this specific authentication code flow from Spotify. The result of the call is unpacked into a list of songs which is started in the state variable results. Every time the user updates the query in the search bar this api call happens.
   React.useEffect(() => {
@@ -49,7 +65,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
           } 
           else {
             console.warn("Invalid search result:", data);
-            setResults([]); // Prevent crash
+            setResults([]);
           }
         });
       }
@@ -59,31 +75,32 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
   
 
 
-  
-  function handleChange(event){
+  // This is an onChange function for when the user is typing in the song search bar.
+  function handleChange(event) {
     setQuery(event.target.value)
   }
 
-  function checkSongListRules(track){
+  // This is a helper function which determines if the song passed in violates any of the custom rules that a user may have set up.
+  function checkSongListRules(track) {
     let isRuleViolated = false
     const artistRule = parseInt(maxSongsPerArtist, 10)
     const albumRule = parseInt(maxSongsPerAlbum, 10)
 
-    if(!isNaN(artistRule)){
+    if (!isNaN(artistRule)) {
       let songsByArtist = 0
       const artist = track.artists[0].name
-      for(let song of songList){
-        if(song.track.artists[0].name === artist)
+      for (let song of songList) {
+        if (song.track.artists[0].name === artist)
           songsByArtist++
       }
 
-      if(songsByArtist >= artistRule)
+      if (songsByArtist >= artistRule)
         isRuleViolated = true
     }
-    if(!isNaN(albumRule)){
+    if (!isNaN(albumRule)) {
       let songsInAlbum = 0
       const album = track.album.name
-      for(let song of songList){
+      for (let song of songList) {
         if(song.track.album.name=== album)
           songsInAlbum++
       }
@@ -91,15 +108,14 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
       if(songsInAlbum >= albumRule)
         isRuleViolated = true
     }
-
     return isRuleViolated
   }
 
-  //This function deals with when the user has clicked on one of the songs resulting from the search. The code makes sure that the song is not a duplicate. I don't believe we can have duplicate songs because there would be issues with the key attribute, which I could get around, but this is better anyways. If the song is not a dupe, then add an object to the end songList. This object just contains the track object. The track objects contains a bunch of information about the song.
-  function handleSongSelection(track){
+  //This function deals with when the user has clicked on one of the songs resulting from the search to add to their list. The code makes sure that the song is not a duplicate and it does not violate any custom rules. If everything is good, then an object containing the track information and any notes the user may want to add is appended to the list.
+  function handleSongSelection(track) {
 
     let isRuleViolated = checkSongListRules(track)
-    if(isRuleViolated){
+    if (isRuleViolated) {
       setWarning("This song breaks one of your rules.")
       setAlertType("error");
       setQuery("")
@@ -107,12 +123,12 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     }
 
     let duplicateSong = false
-    for(let song of songList){
-      if(track.id === song.track.id)
+    for (let song of songList) {
+      if (track.id === song.track.id)
         duplicateSong = true
     }
 
-    if(duplicateSong){
+    if (duplicateSong) {
       setWarning("That song is already in your list.")
       setAlertType("error");
       setQuery("")
@@ -127,9 +143,9 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     ])
   }
 
-  //Once the user selects a song, clear the search bar.
+  //Once the user selects a song, clear the search bar. Uses the ref initialized above to do this.
   React.useEffect(() => {
-    if(searchBar !== null){
+    if (searchBar !== null) {
       searchBar.current.value=""
       setQuery("")
     }
@@ -144,7 +160,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     }
   }, [warning]);
   
-    //Using .map() on the songList to create an array of SongEntry components. The props passed down are: key (required), track (the song objects), index (the index of the element in the list), the setSongs function (I tried to use this for reordering purposes), and the songList itself
+    //Using .map() on the songList to create an array of SongEntry components. Some information about the song is passed down through props.
   const songComponents = songList.map((song, index) => {
     return <SongEntry 
               key={song.track.id} 
@@ -157,6 +173,9 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
   })
 
 
+  /*
+    This is an onClick function for the create playlist button. This purpose of this function is to take the list the user has created and create a new playlist in their spotify account. This function makes sure that the user has given their list a title and that the list has atleast one song. If there is any issues a warning will be displayed communicating to the user what went wrong. If the playlist is successfully added than a  notification will be temporarily displayed to communicate that. 
+   */
   async function createSpotifyPlaylist() {
     if (!listTitle || songList.length === 0) {
       setWarning("Please add a title and at least one song before creating a playlist.");
@@ -165,14 +184,14 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     }
 
     try {
-      // Step 1: get user profile
+      // Get user profile
       const profileRes = await fetch("https://api.spotify.com/v1/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const profileData = await profileRes.json();
       const userId = profileData.id;
 
-      // Step 2: create playlist
+      // Create playlist
       const createRes = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
         method: "POST",
         headers: {
@@ -187,7 +206,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
       });
       const playlistData = await createRes.json();
 
-      // Step 3: add songs
+      // Add songs from their list to the playlist
       const uris = songList.map((song) => song.track.uri);
       await fetch(`https://api.spotify.com/v1/playlists/${playlistData.id}/tracks`, {
         method: "POST",
@@ -207,38 +226,56 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
     }
   }
 
-  async function fetchRecommendations() {
-    if (!token || songList.length === 0) return;
-
-    const trackIds = songList.map((s) => s.track.id);
-
-    try {
-      const res = await fetch("http://localhost:3333/recommendations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackIds, accessToken: token }),
-      });
-
-      const recs = await res.json();
-      console.log("Recommendations:", recs);
-
-      // TODO: set state and render them
-      setRecommendations(recs); // maybe store separately
-    } catch (err) {
-      console.error("Error getting recs:", err);
-    }
+  //Helper function to make sure that when the access token expires a refresh token is ready to replace it.
+  async function refreshAccessToken(refreshToken) {
+    const res = await fetch(`http://localhost:3333/refresh_token?refresh_token=${refreshToken}`);
+    const data = await res.json();
+    return data.access_token;
   }
 
+  // Schedule the refresh token to replace the old token
+  React.useEffect(() => {
+    const refreshToken = localStorage.getItem("refresh_token");
+    const expiryTime = localStorage.getItem("token_expiry");
 
+    if (!refreshToken || !expiryTime)
+      return;
 
-      /*
-        The actual html here is pretty simple. The first div is the search bar. The ref is used to clear the bar. Below that is the html for the dropdown of song options when the user starts typing in the search bar. It will only display the song name and artist. And below that is the list of selected songs.
-      */
+    const scheduleRefresh = () => {
+      const now = Date.now();
+      const delay = expiryTime - now - 5 * 60 * 1000; // refresh 5 min early
+
+      if (delay <= 0) {
+        (async () => {
+          const newToken = await refreshAccessToken(refreshToken);
+          if (newToken) {
+            setToken(newToken);
+            const newExpiry = Date.now() + 3600 * 1000;
+            localStorage.setItem("token_expiry", newExpiry);
+          }
+          scheduleRefresh();
+        })();
+      } else {
+        setTimeout(async () => {
+          const newToken = await refreshAccessToken(refreshToken);
+          if (newToken) {
+            setToken(newToken);
+            const newExpiry = Date.now() + 3600 * 1000;
+            localStorage.setItem("token_expiry", newExpiry);
+          }
+          scheduleRefresh();
+        }, delay);
+      }
+    };
+
+    scheduleRefresh();
+  }, []);
+
   return(
-    <>
+    <div className="bg-gray-800 border-black rounded-4xl p-10">
       {warning && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
-          <div className={`px-4 py-3 rounded-lg shadow-md border ${
+          <div className={`px-4 py-3 rounded-lg text-center text-2xl shadow-md border ${
                             alertType === "success"
                               ? "bg-green-100 border-green-400 text-green-700"
                               : "bg-red-100 border-red-400 text-red-700"
@@ -248,30 +285,24 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
         </div>
       )}
 
-      <div className="flex w-full bg-green-400 h-20 items-center justify-center">
-        <label className="text-2xl p-2 mx-2"> Song Name:
+      <div className="flex w-full h-20 items-center justify-center mb-5 tracking-widest">
+        <label className="text-4xl p-2"> Enter Song Name: 
           <input
             type="text"
-            placeholder="ex. Diamonds"
             name="song-name"
             onChange={handleChange}
             value={query}
-            className="text-2xl border-2 rounded-2xl p-4"
+            className="text-2xl border-2 rounded-2xl ml-5 p-4 text-center"
             ref = {searchBar}
+            autoComplete="off"
           />
         </label>
-        <button
-          onClick={fetchRecommendations}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 mt-4"
-          >
-          Get Song Recommendations
-        </button>
       </div>
 
       {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
-        (<ul className="flex items-center justify-center flex-col bg-purple-600 w-full absolute z-10">
+        (<ul className="flex items-center justify-center flex-col bg-gray-600 w-full absolute z-10">
             {results.map(track => (
-              <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-auto h-20 justify-center items-center hover:bg-amber-300 p-4" value={track}>
+              <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-auto h-20 justify-center items-center hover:bg-gray-400 p-4" value={track}>
                 <div className="text-3xl p-4">
                   <strong>{track.name}</strong> by {track.artists[0].name}
                 </div>
@@ -284,27 +315,14 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
         {songComponents}
       </div> 
 
-      {recommendations.length > 0 && (
-        <div className="w-full mt-6">
-          <h2 className="text-2xl font-bold mb-2">Recommended Songs</h2>
-          <ul>
-            {recommendations.map((track) => (
-              <li key={track.id} className="p-2 border-b">
-                <strong>{track.name}</strong> by {track.artists[0].name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="flex justify-center my-6">
+      <div className="flex justify-center mt-15">
         <button
           onClick={createSpotifyPlaylist}
-          className="bg-blue-500 text-white font-bold py-3 px-6 rounded-full shadow-md hover:bg-blue-600 transition"
+          className="bg-blue-500 text-white cursor-pointer text-4xl font-bold py-3 px-6 rounded-full shadow-md hover:bg-blue-600 transition"
         >
           Create Playlist on Spotify
         </button>
       </div>
-    </>
+    </div>
   )
 }
