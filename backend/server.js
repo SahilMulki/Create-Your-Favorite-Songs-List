@@ -16,8 +16,9 @@ const app = express();
 app.use(express.json());
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
+const BACKEND_URL = process.env.BACKEND_URL;
 // 🔧 Spotify will redirect the user back to your frontend
-const REDIRECT_URI = `${FRONTEND_URL}/callback`;
+const REDIRECT_URI = `${BACKEND_URL}/callback`;
 
 app.use(
   cors({
