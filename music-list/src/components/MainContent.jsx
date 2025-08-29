@@ -26,6 +26,10 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
   //There is a ref here so that when search bar is empty or there are no results, there is no dropdown of songs being displayed.
   const searchBar = React.useRef(null)
 
+  React.useEffect(() => {
+    console.log("🎫 Current token:", token);
+  }, [token]);
+
   // This useEffect function gets the accessToken, refreshToken, and when the access token expires from the url once the user has been refirected after connecting with spotify. The refresh token is stored in localStorage. Once that information is stored the url is cleared of the information.
  React.useEffect(() => {
   const params = new URLSearchParams(window.location.search);
@@ -60,6 +64,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
         })
         .then(res => res.json())
         .then(data => {
+          console.log("🔍 Spotify search response:", data);
           if (data.tracks && data.tracks.items) {
             setResults(data.tracks.items);
           } 
