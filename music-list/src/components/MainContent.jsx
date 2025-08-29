@@ -228,7 +228,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
 
   //Helper function to make sure that when the access token expires a refresh token is ready to replace it.
   async function refreshAccessToken(refreshToken) {
-    const res = await fetch(`http://localhost:3333/refresh_token?refresh_token=${refreshToken}`);
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/refresh_token?refresh_token=${refreshToken}`);
     const data = await res.json();
     return data.access_token;
   }

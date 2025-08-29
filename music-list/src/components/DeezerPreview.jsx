@@ -14,7 +14,7 @@ export default function DeezerPreview({ trackName, artistName }) {
     async function fetchPreview() {
       try {
         const response = await fetch(
-          `http://localhost:3333/deezer-preview?track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
+          `${import.meta.env.VITE_BACKEND_URL}/deezer-preview?track=${encodeURIComponent(trackName)}&artist=${encodeURIComponent(artistName)}`
         );
         const data = await response.json();
 

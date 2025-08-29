@@ -70,7 +70,7 @@ app.get("/callback", async (req, res) => {
   `http://localhost:5173/?access_token=${data.access_token}&refresh_token=${data.refresh_token}`
 );*/
   res.redirect(
-  `http://localhost:5173/?access_token=${data.access_token}&refresh_token=${data.refresh_token}&expires_in=${data.expires_in}`
+  `http://${FRONTEND_URL}/?access_token=${data.access_token}&refresh_token=${data.refresh_token}&expires_in=${data.expires_in}`
 );
 
 });
