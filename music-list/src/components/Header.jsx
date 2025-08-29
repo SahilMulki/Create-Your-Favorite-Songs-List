@@ -4,7 +4,7 @@ export default function Header(props){
     This component displays the title of the page as well as the button that the user can click to connect with spotify.
   */
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3333";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   function handleLogin() {
     // Redirect the user to the backend's login endpoint to begin the Spotify flow

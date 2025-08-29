@@ -15,7 +15,7 @@ const app = express();
 //app.use(cors());
 app.use(express.json());
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const FRONTEND_URL = process.env.FRONTEND_URL;
 // 🔧 Spotify will redirect the user back to your frontend
 const REDIRECT_URI = `${FRONTEND_URL}/callback`;
 
