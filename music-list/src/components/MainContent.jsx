@@ -302,7 +302,7 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
           />
         </label>
         {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
-          (<ul className="absolute top-full mt-2 w-full max-w-2xl left-1/2 -translate-x-1/2 bg-gray-600 rounded-xl shadow-lg z-10">
+          (<ul className="absolute top-full mt-5 w-full max-w-2xl left-1/2 -translate-x-1/2 bg-gray-600 rounded-xl shadow-lg z-10">
               {results.map(track => (
                 <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-auto h-20 justify-center items-center hover:bg-gray-400 p-4" value={track}>
                   <div className="text-2xl">

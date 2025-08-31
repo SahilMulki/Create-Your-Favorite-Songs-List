@@ -22,7 +22,7 @@ export default function ListCustomizer(
   }
 
   return (
-    <div className="flex items-center p-3 h-20 my-5 bg-gray-800 border-black rounded-4xl">
+    <div className="flex flex-col items-center p-3 min-h-20 my-5 bg-gray-800 border-black rounded-4xl relative">
       <div className="flex w-full justify-between mx-2">
         <button 
           className="bg-gray-800 text-3xl border-2 p-3 rounded-3xl hover:bg-gray-600 transition duration-300 ease-in-out cursor-pointer"
