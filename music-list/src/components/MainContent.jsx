@@ -289,9 +289,8 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
           </div>
         </div>
       )}
-
-      <div className="flex w-full h-20 items-center justify-center mb-5 tracking-widest">
-        <label className="text-4xl p-2"> Enter Song Name: 
+      <div className="flex flex-col w-full items-center relative mb-5 tracking-widest">
+        <label className="text-4xl p-2 flex flex-col items-center w-full max-w-2xl"> Enter Song Name: 
           <input
             type="text"
             name="song-name"
@@ -302,19 +301,18 @@ export default function MainContent( {songList, setSongList, maxSongsPerArtist, 
             autoComplete="off"
           />
         </label>
+        {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
+          (<ul className="absolute top-full mt-2 w-full max-w-2xl left-1/2 -translate-x-1/2 bg-gray-600 rounded-xl shadow-lg z-10">
+              {results.map(track => (
+                <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-auto h-20 justify-center items-center hover:bg-gray-400 p-4" value={track}>
+                  <div className="text-2xl">
+                    <strong>{track.name}</strong> by {track.artists[0].name}
+                  </div>
+                </li>
+              ))}
+            </ul>) : undefined
+        }
       </div>
-
-      {isLoggedIntoSpotify && query.length > 1 && results.length > 1 ?
-        (<ul className="flex items-center justify-center flex-col bg-gray-600 w-full absolute z-10">
-            {results.map(track => (
-              <li key={track.id} onClick={() => handleSongSelection(track)} className="flex w-auto h-20 justify-center items-center hover:bg-gray-400 p-4" value={track}>
-                <div className="text-3xl p-4">
-                  <strong>{track.name}</strong> by {track.artists[0].name}
-                </div>
-              </li>
-            ))}
-          </ul>) : undefined
-      }
 
       <div className="flex flex-col items-center w-full max-w-8xl mx-auto space-y-4 px-4 ">
         {songComponents}

@@ -44,7 +44,7 @@ export default function ListCustomizer(
         </button>
       </div>
       {customizerIsShown ?
-      <div className="absolute mt-50 text-3xl w-full bg-white border rounded-lg shadow-lg p-4 z-20">
+      <div className="absolute top-full mt-3 w-full max-w-2xl left-1/2 -translate-x-1/2 bg-white border rounded-xl shadow-lg p-4 z-20">
           <label className="flex items-center mb-3">
             <input
               type="checkbox"
@@ -58,7 +58,7 @@ export default function ListCustomizer(
               className="mr-2"
             />
             <span
-              className={`flex items-center justify-center gap-2 ${
+              className={`flex items-center justify-between gap-2 flex-1 ${
                 maxSongsPerArtistEnabled ? "text-black" : "text-gray-400"
               }`}
             >
@@ -86,7 +86,7 @@ export default function ListCustomizer(
               className="mr-2"
             />
             <span
-              className={`flex items-center gap-2 ${
+              className={`flex items-center justify-between gap-2 flex-1 ${
                 maxSongsPerAlbumEnabled ? "text-black" : "text-gray-400"
               }`}
             >

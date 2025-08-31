@@ -17,7 +17,7 @@ app.use(express.json());
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = process.env.BACKEND_URL;
-// 🔧 Spotify will redirect the user back to your frontend
+
 const REDIRECT_URI = `${BACKEND_URL}/callback`;
 
 app.use(
@@ -29,22 +29,22 @@ app.use(
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-//const REDIRECT_URI = "https://5f2b97d58a8a.ngrok-free.app/callback";
+
 const PORT = process.env.PORT || 3333;
 
-// ✅ Step 1: Redirect to Spotify login
+//Redirect to Spotify login
 app.get("/login", (req, res) => {
   console.log("✅ /login route hit");
   const scope = "user-read-private user-read-email playlist-modify-public";
   const authURL = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${encodeURIComponent(
     scope
   )}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
-  // Log the full authorization URL to the console for debugging
+
   console.log("➡️ Redirecting to Spotify with URL:", authURL);
   res.redirect(authURL);
 });
 
-// ✅ Step 2: Handle redirect from Spotify
+//Handle redirect from Spotify
 app.get("/callback", async (req, res) => {
   const code = req.query.code;
 
@@ -65,11 +65,6 @@ app.get("/callback", async (req, res) => {
   const data = await response.json();
   console.log("🎟️ Tokens received:", data);
 
-  //res.redirect(`http://localhost:5173/?access_token=${data.access_token}`);
-  /*
-  res.redirect(
-  `http://localhost:5173/?access_token=${data.access_token}&refresh_token=${data.refresh_token}`
-);*/
   res.redirect(
   `${FRONTEND_URL}/?access_token=${data.access_token}&refresh_token=${data.refresh_token}&expires_in=${data.expires_in}`
 );
@@ -98,7 +93,7 @@ app.get("/deezer-preview", async (req, res) => {
       return res.status(404).json({ error: "No preview found" });
     }
   } catch (err) {
-    console.error("❌ Deezer fetch error:", err);
+    console.error("Deezer fetch error:", err);
     return res.status(500).json({ error: "Failed to fetch from Deezer" });
   }
 });
@@ -122,7 +117,7 @@ app.get("/refresh_token", async (req, res) => {
   });
 
   const data = await response.json();
-  res.json(data); // contains a new access_token
+  res.json(data);
 });
 
 async function refreshAccessToken(refreshToken) {
@@ -150,7 +145,7 @@ async function refreshAccessToken(refreshToken) {
 app.get("/test", (req, res) => res.send("Server is working"));
 
 app.listen(PORT, () => {
-  console.log(`✅ Backend running on http://localhost:${PORT}`);
+  console.log(`Backend running on http://localhost:${PORT}`);
 });
 
 

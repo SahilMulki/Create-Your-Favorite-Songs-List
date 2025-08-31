@@ -90,7 +90,7 @@ export default function SongEntry(props) {
             <img src={props.track.album.images[0]?.url} alt="album" width={120} className="border-white border-2"/>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-6xl font-bold text-center">{props.track.name} by {props.track.artists[0].name}</h1>
+            <h1 className="text-5xl font-bold text-center">{props.track.name} by {props.track.artists[0].name}</h1>
             <h1 className="text-3xl font-semibold text-center">{props.track.album.name}</h1>
           </div>
           <div className="flex items-center justify-center">
